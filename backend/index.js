@@ -31,9 +31,10 @@ const vibeMap = {
   tired: { emoji: "🥱", message: "Hydrate. Stretch. Then commit." },
   stressed: { emoji: "😵‍💫", message: "Breathe. One bug at a time." },
 };
-// Smash counter with enhanced tracking
+// Smash counter with enhanced tracking and validation
 let smashes = 0;
 let smashHistory = [];
+const MAX_SMASHES = 9999; // Prevent overflow
 
 // GET /api/fortune -> returns one random fortune
 app.get("/api/fortune", (req, res) => {
@@ -61,10 +62,18 @@ app.get("/api/vibe", (req, res) => {
 
 /**
  * POST /api/smash
- * Increases the smash counter and logs the event
+ * Increases the smash counter with validation
  * Response: { smashes: number, message: string }
  */
 app.post("/api/smash", (req, res) => {
+  // Validate counter limit
+  if (smashes >= MAX_SMASHES) {
+    return res.status(400).json({ 
+      error: "Smash limit reached!",
+      smashes: MAX_SMASHES 
+    });
+  }
+  
   smashes += 1;
   
   // Track smash event
@@ -102,6 +111,20 @@ app.get("/api/smash-history", (req, res) => {
   res.json({ 
     history: smashHistory,
     total: smashes
+  });
+});
+
+/**
+ * DELETE /api/smashes
+ * Resets the smash counter to zero
+ * Response: { smashes: number, message: string }
+ */
+app.delete("/api/smashes", (req, res) => {
+  smashes = 0;
+  smashHistory = [];
+  res.json({ 
+    smashes: 0,
+    message: "Smash counter reset! 🔄"
   });
 });
 
