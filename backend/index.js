@@ -1,6 +1,8 @@
 /**
  * VibeCheck API (CPE 411L)
- *
+ * Version: 1.1
+ * Last updated: January 2026
+ * 
  * This server:
  * - runs on your computer (localhost)
  * - listens on a port (default: 3000)
