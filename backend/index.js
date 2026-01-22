@@ -6,10 +6,8 @@
  * - listens on a port (default: 3000)
  * - responds to browser requests (endpoints) using JSON
  */
-
 const express = require("express");
 const cors = require("cors");
-
 const app = express();
 const PORT = 3000;
 
@@ -42,23 +40,43 @@ const vibeMap = {
 // Smash counter (stored in memory for now)
 let smashes = 0;
 
-// GET /api/fortune -> returns one random fortune
+/**
+ * GET /api/fortune
+ * Returns one random fortune from the fortunes array
+ * Response format: { fortune: string }
+ */
 app.get("/api/fortune", (req, res) => {
-  const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
-  res.json({ fortune: pick });
+  try {
+    const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
+    res.json({ fortune: pick });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch fortune" });
+  }
 });
 
-// GET /api/joke -> returns one random joke
+/**
+ * GET /api/joke
+ * Returns one random joke from the jokes array
+ * Response format: { joke: string }
+ */
 app.get("/api/joke", (req, res) => {
-  const pick = jokes[Math.floor(Math.random() * jokes.length)];
-  res.json({ joke: pick });
+  try {
+    const pick = jokes[Math.floor(Math.random() * jokes.length)];
+    res.json({ joke: pick });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch joke" });
+  }
 });
 
-// GET /api/vibe?mood=happy|tired|stressed
+/**
+ * GET /api/vibe?mood=happy|tired|stressed
+ * Returns vibe response based on mood parameter
+ * Response format: { mood: string, emoji: string, message: string }
+ */
 app.get("/api/vibe", (req, res) => {
   const mood = (req.query.mood || "").toLowerCase();
   const vibe = vibeMap[mood];
-
+  
   if (!vibe) {
     return res.json({
       mood: mood || "unknown",
@@ -66,7 +84,7 @@ app.get("/api/vibe", (req, res) => {
       message: "Try mood=happy, tired, or stressed.",
     });
   }
-
+  
   res.json({ mood, ...vibe });
 });
 
@@ -81,14 +99,18 @@ app.get("/api/smashes", (req, res) => {
   res.json({ smashes });
 });
 
-// GET /api/secret?code=411L -> hidden message if code is correct
+/**
+ * GET /api/secret?code=411L
+ * Hidden endpoint that requires correct code parameter
+ * Response format: { message: string }
+ */
 app.get("/api/secret", (req, res) => {
   const code = req.query.code;
-
+  
   if (code === "411L") {
     return res.json({ message: "🎉 Secret unlocked: +10 luck on your next merge!" });
   }
-
+  
   res.status(403).json({ message: "Nope 😄 Try code=411L" });
 });
 
